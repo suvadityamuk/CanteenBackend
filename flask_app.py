@@ -4,11 +4,11 @@ from connector import executeReadQuery, executeWriteQuery
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def home():
     return render_template("index.html")
 
-@app.route("/userHealth", methods=['GET'])
+@app.route("/userHealth")
 def health():
     result = {
         'result': 'User APIs working'
