@@ -4,7 +4,7 @@ from connector import executeReadQuery, executeWriteQuery
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def home():
     return render_template("index.html")
 
