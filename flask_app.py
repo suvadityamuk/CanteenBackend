@@ -189,7 +189,7 @@ def create_app():
         paid_status = request.args.get('paid_status')
         total_price = request.args.get('total_price')
 
-        SQL_1 = '''INSERT INTO Orders(total_price, payment_mode, paid) VALUES (%(total_price)s, %(payment_mode)s, %(paid)s)'''
+        SQL_1 = '''INSERT INTO Orders(total_price, payment_id, paid) VALUES (%(total_price)s, %(payment_id)s, %(paid)s)'''
         sql1_data = {
             'total_price':total_price,
             'payment_id':payment_id,
