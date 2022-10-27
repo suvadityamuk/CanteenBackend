@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask import request, jsonify
 from connector import executeReadQuery, executeWriteQuery
+import razorpay
 
 def create_app():
     app = Flask(__name__)
@@ -211,6 +212,27 @@ def create_app():
         }
 
         return jsonify(result)
+
+    @app.route("/generateOrderId", methods=['GET'])
+    def generateOrderId():
+        total_price = request.args.get('total_price')
+        key_id = "rzp_test_LqOsU0I0kdU748"
+        key_secret = "Bl2RDP7CRlCBi7dqRcX5CthA"
+        client = razorpay.Client(
+            auth=(key_id, key_secret)
+        )
+        DATA = {
+            "amount":total_price,
+            "currency":"INR",
+            "receipt": "random_receipt"
+        }
+        order = client.order.create(DATA)
+        order_id = order.id
+        result = {
+            'order_id':order_id
+        }
+        return jsonify(result)
+        
 
     @app.route("/deleteOrder", methods=['POST'])
     def deleteOrder():
