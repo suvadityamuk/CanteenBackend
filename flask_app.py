@@ -185,14 +185,14 @@ def create_app():
     @app.route("/createOrder", methods=['POST'])
     def createOrder():
         items = request.args.get('items').split(',')
-        payment_mode = request.args.get('payment_mode')
+        payment_id = request.args.get('payment_id')
         paid_status = request.args.get('paid_status')
         total_price = request.args.get('total_price')
 
         SQL_1 = '''INSERT INTO Orders(total_price, payment_mode, paid) VALUES (%(total_price)s, %(payment_mode)s, %(paid)s)'''
         sql1_data = {
             'total_price':total_price,
-            'payment_mode':payment_mode,
+            'payment_id':payment_id,
             'paid':paid_status
         }
 
