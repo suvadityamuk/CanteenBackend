@@ -230,5 +230,7 @@ def deleteOrder():
 
     return jsonify(result)
 
+app.url_map.strict_slashes = False
+
 if __name__=='__main__':
     app.run()
