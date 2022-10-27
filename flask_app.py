@@ -208,7 +208,8 @@ def create_app():
         resultSet2 = executeWriteQuery(SQL_2)
 
         result = {
-            "outcome":'Success' if isinstance(resultSet2, int) else 'Failure'
+            "outcome":'Success' if isinstance(resultSet2, int) else 'Failure',
+            "order_id":resultSet2 if isinstance(resultSet2, int) else 0
         }
 
         return jsonify(result)
