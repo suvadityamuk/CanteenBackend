@@ -2,233 +2,235 @@ from flask import Flask, render_template
 from flask import request, jsonify
 from connector import executeReadQuery, executeWriteQuery
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return render_template("index.html")
+    @app.route('/')
+    def home():
+        return render_template("index.html")
 
-@app.route("/userHealth")
-def health():
-    result = {
-        'result': 'User APIs working'
-    }
-    return jsonify(result)
+    @app.route("/userHealth")
+    def health():
+        result = {
+            'result': 'User APIs working'
+        }
+        return jsonify(result)
 
-@app.route("/createUser", methods=['POST'])
-def createUser():
+    @app.route("/createUser", methods=['POST'])
+    def createUser():
 
-    username = request.args.get('username')
-    password = request.args.get('pwd')
-    mobile_num = request.args.get('mobile_num')
-    name = request.args.get('name')
-    email = request.args.get('email')
+        username = request.args.get('username')
+        password = request.args.get('pwd')
+        mobile_num = request.args.get('mobile_num')
+        name = request.args.get('name')
+        email = request.args.get('email')
 
-    SQL_STATEMENT = '''INSERT INTO Users(username, pwd, mobile_num, name, email)
-    VALUES (%(username)s, %(password)s, %(mobile_num)s, %(name)s, %(email)s)'''
-    data = {
-        'username':username,
-        'password':password,
-        'mobile_num':mobile_num,
-        'name':name,
-        'email':email
-    }
+        SQL_STATEMENT = '''INSERT INTO Users(username, pwd, mobile_num, name, email)
+        VALUES (%(username)s, %(password)s, %(mobile_num)s, %(name)s, %(email)s)'''
+        data = {
+            'username':username,
+            'password':password,
+            'mobile_num':mobile_num,
+            'name':name,
+            'email':email
+        }
 
-    resultSet = executeWriteQuery(SQL_STATEMENT, data)
-
-    result = {
-        "outcome":resultSet
-    }
-
-    return jsonify(result)
-
-
-@app.route("/deleteUser", methods=['POST'])
-def deleteUser():
-
-    username = request.args.get('username')
-    password = request.args.get('pwd')
-
-    SQL_STATEMENT = '''DELETE FROM Users WHERE username=%s AND pwd=%s'''
-    data = [username, password]
-
-    resultSet = executeWriteQuery(SQL_STATEMENT, data)
-
-    result = {
-        "outcome":resultSet
-    }
-
-    return jsonify(result)
-
-@app.route("/updateUser", methods=['POST'])
-def updateUser():
-    username = request.args.get('username').split(',')
-    password = request.args.get('password').split(',')
-    update_columns = request.args.get('update_cols').split(',')
-    update_vals = request.args.get('update_vals').split(',')
-    update_set = []
-
-    for column, val in zip(update_columns, update_vals):
-        update_set.append(f'{column}={val}')
-
-    SQL_STATEMENT = f'''UPDATE Users SET {*update_set,} WHERE username=%s AND pwd=%s'''
-    data = [username, password]
-
-    resultSet = executeWriteQuery(SQL_STATEMENT, data)
-
-    result = {
-        "outcome":resultSet
-    }
-
-    return jsonify(result)
-
-@app.route("/authUser", methods=['GET'])
-def authUser():
-    username = request.args.get('username')
-    password = request.args.get('password')
-
-    SQL_STATEMENT = '''SELECT * FROM Users WHERE username=%s'''
-    data = [username]
-
-    resultSet = executeReadQuery(SQL_STATEMENT, data)
-
-    db_pwd = resultSet[0][2]
-
-    if db_pwd == password:
-
-        db_userid = resultSet[0][0]
-        db_name = resultSet[0][1]
-        db_email = resultSet[0][3]
-        db_mobile_num = resultSet[0][4]
-        db_username = resultSet[0][5]
+        resultSet = executeWriteQuery(SQL_STATEMENT, data)
 
         result = {
-            "outcome": "Success",
-            "username":db_username,
-            "user_id":db_userid,
-            "pwd":db_pwd,
-            "email":db_email,
-            "mobile_num":db_mobile_num,
-            "name":db_name
+            "outcome":resultSet
         }
 
         return jsonify(result)
 
-    else:
+
+    @app.route("/deleteUser", methods=['POST'])
+    def deleteUser():
+
+        username = request.args.get('username')
+        password = request.args.get('pwd')
+
+        SQL_STATEMENT = '''DELETE FROM Users WHERE username=%s AND pwd=%s'''
+        data = [username, password]
+
+        resultSet = executeWriteQuery(SQL_STATEMENT, data)
 
         result = {
-            "outcome": "Failure"
+            "outcome":resultSet
         }
 
         return jsonify(result)
 
-@app.route("/getDailyLunchItems", methods=['GET'])
-def getDailyLunchItems():
+    @app.route("/updateUser", methods=['POST'])
+    def updateUser():
+        username = request.args.get('username').split(',')
+        password = request.args.get('password').split(',')
+        update_columns = request.args.get('update_cols').split(',')
+        update_vals = request.args.get('update_vals').split(',')
+        update_set = []
 
-    SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN (22, 103, 166, 188, 77)'''
-    data = []
+        for column, val in zip(update_columns, update_vals):
+            update_set.append(f'{column}={val}')
 
-    resultSet = executeReadQuery(SQL_STATEMENT, data)
+        SQL_STATEMENT = f'''UPDATE Users SET {*update_set,} WHERE username=%s AND pwd=%s'''
+        data = [username, password]
 
-    result = {
-        "dailyLunchItems":resultSet
-    }
+        resultSet = executeWriteQuery(SQL_STATEMENT, data)
 
-    return jsonify(result)
+        result = {
+            "outcome":resultSet
+        }
 
-@app.route("/getAllItems", methods=['GET'])
-def getAllItems():
+        return jsonify(result)
 
-    SQL_STATEMENT = '''SELECT * FROM Items'''
-    data = []
+    @app.route("/authUser", methods=['GET'])
+    def authUser():
+        username = request.args.get('username')
+        password = request.args.get('password')
 
-    resultSet = executeReadQuery(SQL_STATEMENT, data)
+        SQL_STATEMENT = '''SELECT * FROM Users WHERE username=%s'''
+        data = [username]
 
-    result = {
-        "items":resultSet
-    }
+        resultSet = executeReadQuery(SQL_STATEMENT, data)
 
-    return jsonify(result)
+        db_pwd = resultSet[0][2]
 
-@app.route("/getPopularItems", methods=['GET'])
-def getPopularItems():
+        if db_pwd == password:
 
-    SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN
-    (SELECT * FROM
-    (SELECT item_id FROM order_item GROUP BY item_id ORDER BY COUNT(*) DESC LIMIT 1) temp_tab)'''
-    data = []
+            db_userid = resultSet[0][0]
+            db_name = resultSet[0][1]
+            db_email = resultSet[0][3]
+            db_mobile_num = resultSet[0][4]
+            db_username = resultSet[0][5]
 
-    resultSet = executeReadQuery(SQL_STATEMENT, data)
+            result = {
+                "outcome": "Success",
+                "username":db_username,
+                "user_id":db_userid,
+                "pwd":db_pwd,
+                "email":db_email,
+                "mobile_num":db_mobile_num,
+                "name":db_name
+            }
 
-    result = {
-        "popularItems":resultSet
-    }
+            return jsonify(result)
 
-    return jsonify(result)
+        else:
 
-@app.route("/getMealOfDay", methods=['GET'])
-def getMealOfDay():
+            result = {
+                "outcome": "Failure"
+            }
 
-    SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN (2, 7, 235, 202) ORDER BY RAND() LIMIT 1'''
-    data = []
+            return jsonify(result)
 
-    resultSet = executeReadQuery(SQL_STATEMENT, data)
+    @app.route("/getDailyLunchItems", methods=['GET'])
+    def getDailyLunchItems():
 
-    result = {
-        "mealOfDayItems":resultSet
-    }
+        SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN (22, 103, 166, 188, 77)'''
+        data = []
 
-    return jsonify(result)
+        resultSet = executeReadQuery(SQL_STATEMENT, data)
 
-@app.route("/createOrder", methods=['POST'])
-def createOrder():
-    items = request.args.get('items').split(',')
-    payment_mode = request.args.get('payment_mode')
-    paid_status = request.args.get('paid_status')
-    total_price = request.args.get('total_price')
+        result = {
+            "dailyLunchItems":resultSet
+        }
 
-    SQL_1 = '''INSERT INTO Orders(total_price, payment_mode, paid) VALUES (%(total_price)s, %(payment_mode)s, %(paid)s)'''
-    sql1_data = {
-        'total_price':total_price,
-        'payment_mode':payment_mode,
-        'paid':paid_status
-    }
+        return jsonify(result)
 
-    resultSet1 = executeWriteQuery(SQL_1, sql1_data)
+    @app.route("/getAllItems", methods=['GET'])
+    def getAllItems():
 
-    order_id = resultSet1
+        SQL_STATEMENT = '''SELECT * FROM Items'''
+        data = []
 
-    item_set = [(order_id, int(i)) for i in items]
-    item_set = f'{*item_set,}'
-    item_set = item_set[1:len(item_set)-1]
+        resultSet = executeReadQuery(SQL_STATEMENT, data)
 
-    SQL_2 = f'''INSERT INTO order_item(order_id, item_id) VALUES {item_set}'''
-    resultSet2 = executeWriteQuery(SQL_2)
+        result = {
+            "items":resultSet
+        }
 
-    result = {
-        "outcome":'Success' if isinstance(resultSet2, int) else 'Failure'
-    }
+        return jsonify(result)
 
-    return jsonify(result)
+    @app.route("/getPopularItems", methods=['GET'])
+    def getPopularItems():
 
-@app.route("/deleteOrder", methods=['POST'])
-def deleteOrder():
-    order_id = request.args.get('order_id')
+        SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN
+        (SELECT * FROM
+        (SELECT item_id FROM order_item GROUP BY item_id ORDER BY COUNT(*) DESC LIMIT 1) temp_tab)'''
+        data = []
 
-    SQL_1 = '''DELETE FROM order_item WHERE order_id=%s'''
-    data = [order_id]
+        resultSet = executeReadQuery(SQL_STATEMENT, data)
 
-    resultSet1 = executeWriteQuery(SQL_1, data)
+        result = {
+            "popularItems":resultSet
+        }
 
-    SQL_2 = '''DELETE FROM Orders WHERE order_id=%s'''
-    data = [order_id]
+        return jsonify(result)
 
-    resultSet2 = executeWriteQuery(SQL_2, data)
-    result = {
-        "outcome":'Success' if isinstance(resultSet2, int) else 'Failure'
-    }
+    @app.route("/getMealOfDay", methods=['GET'])
+    def getMealOfDay():
 
-    return jsonify(result)
+        SQL_STATEMENT = '''SELECT * FROM Items WHERE item_id IN (2, 7, 235, 202) ORDER BY RAND() LIMIT 1'''
+        data = []
 
-# if __name__=='__main__':
-app.run()
+        resultSet = executeReadQuery(SQL_STATEMENT, data)
+
+        result = {
+            "mealOfDayItems":resultSet
+        }
+
+        return jsonify(result)
+
+    @app.route("/createOrder", methods=['POST'])
+    def createOrder():
+        items = request.args.get('items').split(',')
+        payment_mode = request.args.get('payment_mode')
+        paid_status = request.args.get('paid_status')
+        total_price = request.args.get('total_price')
+
+        SQL_1 = '''INSERT INTO Orders(total_price, payment_mode, paid) VALUES (%(total_price)s, %(payment_mode)s, %(paid)s)'''
+        sql1_data = {
+            'total_price':total_price,
+            'payment_mode':payment_mode,
+            'paid':paid_status
+        }
+
+        resultSet1 = executeWriteQuery(SQL_1, sql1_data)
+
+        order_id = resultSet1
+
+        item_set = [(order_id, int(i)) for i in items]
+        item_set = f'{*item_set,}'
+        item_set = item_set[1:len(item_set)-1]
+
+        SQL_2 = f'''INSERT INTO order_item(order_id, item_id) VALUES {item_set}'''
+        resultSet2 = executeWriteQuery(SQL_2)
+
+        result = {
+            "outcome":'Success' if isinstance(resultSet2, int) else 'Failure'
+        }
+
+        return jsonify(result)
+
+    @app.route("/deleteOrder", methods=['POST'])
+    def deleteOrder():
+        order_id = request.args.get('order_id')
+
+        SQL_1 = '''DELETE FROM order_item WHERE order_id=%s'''
+        data = [order_id]
+
+        resultSet1 = executeWriteQuery(SQL_1, data)
+
+        SQL_2 = '''DELETE FROM Orders WHERE order_id=%s'''
+        data = [order_id]
+
+        resultSet2 = executeWriteQuery(SQL_2, data)
+        result = {
+            "outcome":'Success' if isinstance(resultSet2, int) else 'Failure'
+        }
+
+        return jsonify(result)
+
+    # if __name__=='__main__':
+    # app.run()
+    return app
