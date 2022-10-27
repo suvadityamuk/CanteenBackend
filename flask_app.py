@@ -184,7 +184,7 @@ def create_app():
 
     @app.route("/createOrder", methods=['POST'])
     def createOrder():
-        items = map(request.args.get('items').split(','), int)
+        items = list(map(int, request.args.get('items').split(',')))
         payment_id = request.args.get('payment_id')
         paid_status = request.args.get('paid_status')
         total_price = request.args.get('total_price')
