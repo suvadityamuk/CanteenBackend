@@ -227,7 +227,7 @@ def create_app():
             "receipt": "random_receipt"
         }
         order = client.order.create(DATA)
-        order_id = order.id
+        order_id = order['id']
         result = {
             'order_id':order_id
         }
