@@ -133,7 +133,7 @@ def create_app():
         resultSet = executeReadQuery(SQL_STATEMENT, data)
 
         result = {
-            "dailyLunchItems":resultSet
+            "items":resultSet
         }
 
         return jsonify(result)
@@ -163,7 +163,7 @@ def create_app():
         resultSet = executeReadQuery(SQL_STATEMENT, data)
 
         result = {
-            "popularItems":resultSet
+            "items":resultSet
         }
 
         return jsonify(result)
@@ -177,7 +177,7 @@ def create_app():
         resultSet = executeReadQuery(SQL_STATEMENT, data)
 
         result = {
-            "mealOfDayItems":resultSet
+            "items":resultSet
         }
 
         return jsonify(result)
